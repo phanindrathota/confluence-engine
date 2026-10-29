@@ -1,0 +1,83 @@
+# Universe and cadences for Phase 0 collection.
+# Times are US/Central. All cadences are in seconds.
+
+indices: [SPX, SPY, QQQ, IWM]
+stocks: [NVDA, AAPL, TSLA, META, AMZN, GOOGL, MSFT, COIN, MSTR, MU, SNDK,
+         HOOD, ARM, CRWD, ORCL, QCOM, MRVL, MRNA, SPCX]
+
+session:
+  timezone: America/Chicago
+  collect_start: "08:25"   # a few minutes before the open
+  collect_end: "15:20"     # covers SPX's 15:15 close
+  regular_open: "08:30"
+  regular_close: "15:00"
+
+live:
+  order_flow:
+    cadence_s: 20
+    # Collection floor, deliberately below the alert thresholds
+    # (index 0DTE $250K, stock 0DTE $150K, 7-14 DTE $250K, 90 DTE $500K)
+    # so thresholds can be tuned later without re-collecting.
+    min_premium: 50000
+    max_pages_per_cycle: 10
+  net_drift:
+    cadence_s: 60
+    aggregation: 1m
+  stock_bars:
+    cadence_s: 60
+    aggregation: 1m
+  exposure_fast:            # GEX and DEX snapshots by strike
+    cadence_s: 180
+    greeks: [GAMMA, DELTA]
+    representation: PER_ONE_PERCENT_MOVE
+  exposure_slow:            # charm and vanna move more slowly
+    cadence_s: 600
+    greeks: [CHARM, VANNA]
+    representation: PER_ONE_PERCENT_MOVE
+  dark_flow:
+    cadence_s: 300
+    aggregation: 5m
+  vol_drift:
+    cadence_s: 300
+  news:
+    cadence_s: 120
+
+backfill:
+  # Same datasets as live, pulled per session after the fact.
+  interval_map_aggregation: 5m
+  interval_map_greeks: [GAMMA, DELTA, CHARM, VANNA]
+  min_premium: 50000
+  max_flow_pages_per_ticker_day: 60
+  # Backfill yields to the live collector during market hours unless --force.
+  pause_during_session: true
+
+# NYSE full-day closures and 12:00 CT early closes. Verify each year.
+holidays:
+  - 2025-11-27
+  - 2025-12-25
+  - 2026-01-01
+  - 2026-01-19
+  - 2026-02-16
+  - 2026-04-03
+  - 2026-05-25
+  - 2026-06-19
+  - 2026-07-03
+  - 2026-09-07
+  - 2026-11-26
+  - 2026-12-25
+  - 2027-01-01
+  - 2027-01-18
+  - 2027-02-15
+  - 2027-03-26
+  - 2027-05-31
+  - 2027-06-18
+  - 2027-07-05
+  - 2027-09-06
+  - 2027-11-25
+  - 2027-12-24
+early_closes:
+  - 2025-11-28
+  - 2025-12-24
+  - 2026-11-27
+  - 2026-12-24
+  - 2027-11-26
